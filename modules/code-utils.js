@@ -405,6 +405,9 @@ function update(options)
 //
 function compress(data)
 {
+    if (process.versions && process.versions.node) {
+        return require('zlib').deflateRawSync(data).toString('base64');
+    }
     var zip = require('compressed-stream').createCompressor();
     zip.buffer = null;
     zip.on('data', function (c)
