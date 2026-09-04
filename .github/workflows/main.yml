@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     steps:
     - name: Checkout do Código
@@ -20,7 +20,7 @@ jobs:
 
     - name: Compilar MeshAgent
       run: |
-        msbuild MeshAgent-2022.sln /p:Configuration=Release /p:Platform=x64
+        msbuild MeshAgent.sln /p:Configuration=Release /p:Platform=x64
 
     - name: Localizar Executável
       run: |
