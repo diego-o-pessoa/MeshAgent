@@ -1,0 +1,56 @@
+name: Build and Release MeshAgent (Windows 64-bit)
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout do Código
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive
+
+    - name: Configurar MSBuild
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Compilar MeshAgent (Passo 1 - Base)
+      run: |
+        msbuild MeshAgent-2022.sln /p:Configuration=Release /p:Platform=x64
+
+    - name: Embutir os arquivos .js modificados no código C++
+      run: |
+        $agent = Get-ChildItem -Path . -Filter "MeshService64.exe" -Recurse | Select-Object -First 1
+        $modulesPath = Join-Path (Get-Location) "modules"
+        $cFilePath = Join-Path (Get-Location) "microscript\ILibDuktape_Polyfills.c"
+        
+        $modulesPath = $modulesPath -replace '\\', '\\\\'
+        $cFilePath = $cFilePath -replace '\\', '\\\\'
+        
+        node -e "require('./modules/code-utils.js').shrink({expandedPath:'$modulesPath',filePath:'$cFilePath'});"
+
+    - name: Recompilar MeshAgent (Passo 2 - Final)
+      run: |
+        msbuild MeshAgent-2022.sln /t:Rebuild /p:Configuration=Release /p:Platform=x64
+
+    - name: Localizar Executável Final
+      run: |
+        Get-ChildItem -Path . -Filter "MeshService64.exe" -Recurse | Copy-Item -Destination "MeshService64.exe"
+
+    - name: Criar tag
+      id: tag_version
+      run: |
+        echo "TAG_NAME=latest" >> $GITHUB_ENV
+
+    - name: Publicar Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: latest
+        name: Latest Build
+        files: MeshService64.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
