@@ -8,6 +8,8 @@ on:
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: write
 
     steps:
     - name: Checkout do Código
@@ -44,7 +46,7 @@ jobs:
     - name: Criar tag
       id: tag_version
       run: |
-        echo "TAG_NAME=latest" >> $GITHUB_ENV
+        echo "TAG_NAME=latest" >> $env:GITHUB_ENV
 
     - name: Publicar Release
       uses: softprops/action-gh-release@v1
