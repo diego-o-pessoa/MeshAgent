@@ -34,7 +34,7 @@ jobs:
         node -e "require('./modules/code-utils.js').shrink({expandedPath:'$modulesPath',filePath:'$cFilePath'});"
 
     - name: Recompilar MeshAgent (Passo 2 - Final)
-      run: |
+      run: |  
         msbuild MeshAgent-2022.sln /t:Rebuild /p:Configuration=Release /p:Platform=x64
 
     - name: Localizar Executável Final
