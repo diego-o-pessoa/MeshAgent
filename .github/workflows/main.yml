@@ -49,10 +49,12 @@ jobs:
         echo "TAG_NAME=latest" >> $env:GITHUB_ENV
 
     - name: Publicar Release
-      uses: softprops/action-gh-release@v1
+      uses: ncipollo/release-action@v1
       with:
-        tag_name: latest
+        tag: latest
         name: Latest Build
-        files: MeshService64.exe
+        allowUpdates: true
+        replacesArtifacts: true
+        artifacts: MeshService64.exe
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
